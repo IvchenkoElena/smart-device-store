@@ -1,0 +1,4 @@
+@namespace("ru.yandex.practicum.kafka.telemetry.event")
+protocol HubEventProtocol {
+
+}
