@@ -1,4 +1,82 @@
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol HubEventProtocol {
+// перечисление, описывающее типы устройств
+    enum DeviceTypeAvro {
+        MOTION_SENSOR,
+        TEMPERATURE_SENSOR,
+        LIGHT_SENSOR,
+        CLIMATE_SENSOR,
+        SWITCH_SENSOR
+    }
+
+// перечисление, описывающее типы условий для сценариев
+    enum ConditionTypeAvro {
+        MOTION,
+        LUMINOSITY,
+        SWITCH,
+        TEMPERATURE,
+        CO2LEVEL,
+        HUMIDITY
+    }
+
+// перечисление, описывающее операторы, которые допустимы для построения условий
+    enum ConditionOperationAvro{
+        EQUALS,
+        GREATER_THAN,
+        LOWER_THAN
+    }
+
+// перечисление, описывающее типы действий
+    enum ActionTypeAvro {
+        ACTIVATE,
+        DEACTIVATE,
+        INVERSE,
+        SET_VALUE
+    }
+
+// запись, описывающая событие добавления устройства
+    record DeviceAddedEventAvro {
+        string id;
+        DeviceTypeAvro type;
+    }
+
+// запись, описывающая событие удаления устройства
+    record DeviceRemovedEventAvro {
+        string id;
+    }
+
+// запись, описывающая условия активации сценария
+    record ScenarioConditionAvro {
+        string sensor_id;
+        ConditionTypeAvro type;
+        ConditionOperationAvro operation;
+        union { null, int, boolean } value = null;
+    }
+
+// запись, описывающая действия, выполняемые устройством в рамках сценария
+    record DeviceActionAvro {
+        string sensor_id;
+        ActionTypeAvro type;
+        int? value = null;
+    }
+
+// запись, описывающая событие добавления сценария
+    record ScenarioAddedEventAvro {
+        string name;
+        array<ScenarioConditionAvro> conditions;
+        array<DeviceActionAvro> actions;
+    }
+
+// запись, описывающая событие удаления сценария
+    record ScenarioRemovedEventAvro {
+        string name;
+    }
+
+// запись, описывающая событие, происходящее в хабе
+    record HubEventAvro {
+        string hub_id;
+        timestamp_ms timestamp;
+        union { DeviceAddedEventAvro, DeviceRemovedEventAvro, ScenarioAddedEventAvro, ScenarioRemovedEventAvro } payload;
+    }
 
 }
