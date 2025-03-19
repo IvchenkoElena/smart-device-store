@@ -11,7 +11,7 @@ import ru.yandex.practicum.telemetry.collector.kafka.Topics;
 
 @Slf4j
 @RequiredArgsConstructor
-public abstract class BaseHubEventHandler <T extends SpecificRecordBase> implements HubEventHandler {
+public abstract class BaseHubEventHandler<T extends SpecificRecordBase> implements HubEventHandler {
     protected final KafkaClientProducer producer;
 
     protected String topic = Topics.TELEMETRY_HUBS_V1_TOPIC;
