@@ -1,14 +1,15 @@
 package ru.yandex.practicum.telemetry.collector.service.handler.hub;
 
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hub.device.DeviceRemovedEvent;
 
 public class DeviceRemovedEventHandler extends BaseHubEventHandler<DeviceRemovedEventAvro> {
-//    protected DeviceRemovedEventHandler(Producer<String, SpecificRecordBase> producer) {
-//        super(producer);
-//    }
+    public DeviceRemovedEventHandler(KafkaClientProducer producer) {
+        super(producer);
+    }
 
     @Override
     protected DeviceRemovedEventAvro mapToAvro(HubEvent event) {
@@ -21,6 +22,6 @@ public class DeviceRemovedEventHandler extends BaseHubEventHandler<DeviceRemoved
 
     @Override
     public HubEventType getMessageType() {
-        return HubEventType.SCENARIO_REMOVED;
+        return HubEventType.DEVICE_REMOVED;
     }
 }

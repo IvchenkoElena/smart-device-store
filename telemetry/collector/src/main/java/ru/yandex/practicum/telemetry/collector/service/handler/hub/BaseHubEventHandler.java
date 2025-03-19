@@ -5,15 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.telemetry.collector.kafka.Client;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 import ru.yandex.practicum.telemetry.collector.kafka.Topics;
 
 @Slf4j
 @RequiredArgsConstructor
 public abstract class BaseHubEventHandler <T extends SpecificRecordBase> implements HubEventHandler {
-    protected Client client;
-    //protected final Producer<String, SpecificRecordBase> producer;
+    protected final KafkaClientProducer producer;
 
     protected String topic = Topics.TELEMETRY_HUBS_V1_TOPIC;
 
@@ -41,7 +40,7 @@ public abstract class BaseHubEventHandler <T extends SpecificRecordBase> impleme
                 eventAvro.getHubId(),
                 eventAvro);
 
-        client.getProducer().send(record);
+        producer.getProducer().send(record);
 
         log.info("Отправили в Kafka: {}", record);
     }

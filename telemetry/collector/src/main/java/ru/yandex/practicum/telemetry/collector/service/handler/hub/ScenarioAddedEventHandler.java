@@ -6,6 +6,7 @@ import ru.yandex.practicum.kafka.telemetry.event.ConditionTypeAvro;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hub.scenario.DeviceAction;
@@ -13,9 +14,9 @@ import ru.yandex.practicum.telemetry.collector.model.hub.scenario.ScenarioAddedE
 import ru.yandex.practicum.telemetry.collector.model.hub.scenario.ScenarioCondition;
 
 public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAddedEventAvro> {
-//    protected ScenarioAddedEventHandler(Producer<String, SpecificRecordBase> producer) {
-//        super(producer);
-//    }
+    public ScenarioAddedEventHandler(KafkaClientProducer producer) {
+        super(producer);
+    }
 
     @Override
     protected ScenarioAddedEventAvro mapToAvro(HubEvent event) {

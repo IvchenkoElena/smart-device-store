@@ -2,15 +2,16 @@ package ru.yandex.practicum.telemetry.collector.service.handler.sensor;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.LightSensorAvro;
+import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
 import ru.yandex.practicum.telemetry.collector.model.sensor.LightSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEventType;
 
 @Component
 public class LightSensorEventHandler extends BaseSensorEventHandler<LightSensorAvro> {
-//    protected LightSensorEventHandler(Producer<String, SpecificRecordBase> producer) {
-//        super(producer);
-//    }
+    public LightSensorEventHandler(KafkaClientProducer producer) {
+        super(producer);
+    }
 
     @Override
     protected LightSensorAvro mapToAvro(SensorEvent event) {
