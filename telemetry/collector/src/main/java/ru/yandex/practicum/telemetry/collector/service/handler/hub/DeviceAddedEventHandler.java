@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.service.handler.hub;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceTypeAvro;
 import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
@@ -7,6 +8,7 @@ import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEventType;
 import ru.yandex.practicum.telemetry.collector.model.hub.device.DeviceAddedEvent;
 
+@Component
 public class DeviceAddedEventHandler extends BaseHubEventHandler<DeviceAddedEventAvro> {
     public DeviceAddedEventHandler(KafkaClientProducer producer) {
         super(producer);
@@ -15,17 +17,10 @@ public class DeviceAddedEventHandler extends BaseHubEventHandler<DeviceAddedEven
     @Override
     protected DeviceAddedEventAvro mapToAvro(HubEvent event) {
         DeviceAddedEvent deviceAddedEvent = (DeviceAddedEvent) event;
-//        DeviceTypeAvro deviceTypeAvro = switch (deviceAddedEvent.getDeviceType()) {
-//            case CLIMATE_SENSOR -> DeviceTypeAvro.CLIMATE_SENSOR;
-//            case LIGHT_SENSOR -> DeviceTypeAvro.LIGHT_SENSOR;
-//            case MOTION_SENSOR -> DeviceTypeAvro.MOTION_SENSOR;
-//            case SWITCH_SENSOR -> DeviceTypeAvro.SWITCH_SENSOR;
-//            case TEMPERATURE_SENSOR -> DeviceTypeAvro.TEMPERATURE_SENSOR;
-//        };
+
         return DeviceAddedEventAvro.newBuilder()
                 .setId(deviceAddedEvent.getId())
                 .setType(DeviceTypeAvro.valueOf(deviceAddedEvent.getDeviceType().name()))
-                //.setType(deviceTypeAvro)
                 .build();
     }
 
