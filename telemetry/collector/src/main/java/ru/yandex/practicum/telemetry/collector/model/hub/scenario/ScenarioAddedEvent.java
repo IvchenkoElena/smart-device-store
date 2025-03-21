@@ -8,7 +8,6 @@ import ru.yandex.practicum.telemetry.collector.model.hub.HubEventType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -21,10 +20,8 @@ public class ScenarioAddedEvent extends HubEvent {
     @Size(min = 3)
     private String name;
 
-    @NotNull
     @NotEmpty
     private List<ScenarioCondition> conditions;
-    @NotNull
     @NotEmpty
     private List<DeviceAction> actions;
 

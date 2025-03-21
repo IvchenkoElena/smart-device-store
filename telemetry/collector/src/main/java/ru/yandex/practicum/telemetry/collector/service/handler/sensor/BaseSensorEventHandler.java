@@ -4,17 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Value;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.collector.kafka.KafkaClientProducer;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
-import ru.yandex.practicum.telemetry.collector.kafka.Topics;
 
 @Slf4j
 @RequiredArgsConstructor
 public abstract class BaseSensorEventHandler<T extends SpecificRecordBase> implements SensorEventHandler {
     protected final KafkaClientProducer producer;
 
-    protected String topic = Topics.TELEMETRY_SENSORS_V1_TOPIC;
+    @Value("${kafka.topic.sensor}")
+    protected String topic;
 
     protected abstract T mapToAvro(SensorEvent event);
 
