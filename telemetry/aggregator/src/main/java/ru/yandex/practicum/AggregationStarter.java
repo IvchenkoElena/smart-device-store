@@ -8,6 +8,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
@@ -26,8 +27,10 @@ public class AggregationStarter {
     private final KafkaConsumer<String, SensorEventAvro> consumer;
     private final KafkaProducer<String, SensorsSnapshotAvro> producer;
     private final SnapshotStorage snapshotStorage;
-    private final String inputTopic;
-    private final String outputTopic;
+    @Value("${kafka.input-topic}")
+    private String inputTopic;
+    @Value("${kafka.output-topic}")
+    private String outputTopic;
 
     /**
      * Метод для начала процесса агрегации данных.

@@ -23,24 +23,8 @@ public class KafkaConfig {
     @Value("${kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${kafka.input-topic}")
-    private String inputTopic;
-
-    @Value("${kafka.output-topic}")
-    private String outputTopic;
-
     @Value("${kafka.group-id}")
     private String consumerGroupId;
-
-    @Bean
-    public String inputTopic() {
-        return inputTopic;
-    }
-
-    @Bean
-    public String outputTopic() {
-        return outputTopic;
-    }
 
     @Bean
     public KafkaConsumer<String, SensorEventAvro> kafkaConsumer() {

@@ -6,7 +6,6 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +48,7 @@ public class SnapshotStorage {
         newState.setData(event.getPayload());
 
         snapshot.getSensorsState().put(event.getId(), newState);
-        snapshot.setTimestamp(Instant.now());
+        snapshot.setTimestamp(event.getTimestamp());
         log.debug("Состояние обновлено для sensorId={}, новое состояние={}",
                 event.getId(), newState);
 
