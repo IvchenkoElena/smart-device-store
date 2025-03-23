@@ -25,10 +25,7 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.avro</groupId>
-            <artifactId>avro</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -64,12 +61,6 @@
 <!--            <version>2.0.1.Final</version>-->
         </dependency>
 
-        <dependency>
-            <groupId>net.devh</groupId>
-            <artifactId>grpc-server-spring-boot-starter</artifactId>
-<!--            <version>3.1.0.RELEASE</version>-->
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -84,10 +75,21 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
 
                 <configuration>
-                    <protocVersion>3.23.4</protocVersion>
+<!--                    <protocVersion>3.23.4</protocVersion>-->
+<!--                    <sourceDirectories>-->
+<!--                        <sourceDirectory>${project.parent.basedir}/src/main/proto</sourceDirectory>-->
+<!--                    </sourceDirectories>-->
+
+                    <protocVersion>${protobuf.version}</protocVersion>
+
+                    <!-- Путь к папке с proto-файлами -->
                     <sourceDirectories>
-                        <sourceDirectory>${project.parent.basedir}/src/main/proto</sourceDirectory>
+                        <sourceDirectory>${project.basedir}/src/main/protobuf</sourceDirectory>
                     </sourceDirectories>
+                    <!-- Путь, куда будут сгенерированы файлы -->
+                    <outputDirectory>${project.build.directory}/generated-sources/protobuf</outputDirectory>
+                    <!-- Подключение grpc-java для генерации кода -->
+
                     <binaryMavenPlugins>
                         <binaryMavenPlugin>
                             <groupId>io.grpc</groupId>
