@@ -80,6 +80,9 @@ public class EventDataProducer {
     private void sendEvent(SensorEventProto event) {
         log.info("Отправляем данные: {}", event.getAllFields());
         collectorStub.collectSensorEvent(event);
+
+//        CollectorResponse response = collectorStub.collectSensorEvent(event);
+//        log.info("Получил ответ от коллектора: {}", response);
     }
 
     // Генерация значения с небольшим отклонением от предыдущего
