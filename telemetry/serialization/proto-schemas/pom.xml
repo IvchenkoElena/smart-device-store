@@ -46,6 +46,14 @@
                 <configuration>
                     <protocVersion>${protobuf.version}</protocVersion>
 
+                    <!-- Путь к папке с proto-файлами -->
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}/src/main/protobuf</sourceDirectory>
+                    </sourceDirectories>
+                    <!-- Путь, куда будут сгенерированы файлы -->
+                    <outputDirectory>${project.build.directory}/generated-sources/protobuf</outputDirectory>
+                    <!-- Подключение grpc-java для генерации кода -->
+
                     <binaryMavenPlugins>
                         <binaryMavenPlugin>
                             <groupId>io.grpc</groupId>

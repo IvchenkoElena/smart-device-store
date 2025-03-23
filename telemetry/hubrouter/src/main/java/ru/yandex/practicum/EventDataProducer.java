@@ -80,9 +80,6 @@ public class EventDataProducer {
     private void sendEvent(SensorEventProto event) {
         log.info("Отправляем данные: {}", event.getAllFields());
         collectorStub.collectSensorEvent(event);
-
-//        CollectorResponse response = collectorStub.collectSensorEvent(event);
-//        log.info("Получил ответ от коллектора: {}", response);
     }
 
     // Генерация значения с небольшим отклонением от предыдущего
@@ -117,8 +114,8 @@ public class EventDataProducer {
                 .setTimestamp(Timestamp.newBuilder()
                         .setSeconds(ts.getEpochSecond())
                         .setNanos(ts.getNano())
-                ).setTemperatureSensor(
-                        TemperatureSensorEvent.newBuilder()
+                ).setTemperatureSensorEvent(
+                        TemperatureSensorProto.newBuilder()
                                 .setTemperatureC(temperatureCelsius)
                                 .setTemperatureF(temperatureFahrenheit)
                                 .build()
@@ -135,8 +132,8 @@ public class EventDataProducer {
                 .setTimestamp(Timestamp.newBuilder()
                         .setSeconds(ts.getEpochSecond())
                         .setNanos(ts.getNano())
-                ).setLightSensor(
-                        LightSensorEvent.newBuilder()
+                ).setLightSensorEvent(
+                        LightSensorProto.newBuilder()
                                 .setLuminosity(luminosity)
                                 .build()
                 )
@@ -154,8 +151,8 @@ public class EventDataProducer {
                 .setTimestamp(Timestamp.newBuilder()
                         .setSeconds(ts.getEpochSecond())
                         .setNanos(ts.getNano())
-                ).setMotionSensor(
-                        MotionSensorEvent.newBuilder()
+                ).setMotionSensorEvent(
+                        MotionSensorProto.newBuilder()
                                 .setMotion(isMotion)
                                 .setLinkQuality(linkQuality)
                                 .setVoltage(voltage)
@@ -173,8 +170,8 @@ public class EventDataProducer {
                 .setTimestamp(Timestamp.newBuilder()
                         .setSeconds(ts.getEpochSecond())
                         .setNanos(ts.getNano())
-                ).setSwitchSensor(
-                        SwitchSensorEvent.newBuilder()
+                ).setSwitchSensorEvent(
+                        SwitchSensorProto.newBuilder()
                                 .setState(state)
                                 .build()
                 )
@@ -192,8 +189,8 @@ public class EventDataProducer {
                 .setTimestamp(Timestamp.newBuilder()
                         .setSeconds(ts.getEpochSecond())
                         .setNanos(ts.getNano())
-                ).setClimateSensor(
-                        ClimateSensorEvent.newBuilder()
+                ).setClimateSensorEvent(
+                        ClimateSensorProto.newBuilder()
                                 .setTemperatureC(temperature)
                                 .setHumidity(humidity)
                                 .setCo2Level(co2Level)
