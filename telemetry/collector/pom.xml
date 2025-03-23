@@ -91,44 +91,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>io.github.ascopes</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-
-                <configuration>
-<!--                    <protocVersion>3.23.4</protocVersion>-->
-<!--                    <sourceDirectories>-->
-<!--                        <sourceDirectory>${project.parent.basedir}/src/main/proto</sourceDirectory>-->
-<!--                    </sourceDirectories>-->
-
-                    <protocVersion>${protobuf.version}</protocVersion>
-
-<!--                    &lt;!&ndash; Путь к папке с proto-файлами &ndash;&gt;-->
-<!--                    <sourceDirectories>-->
-<!--                        <sourceDirectory>${project.basedir}/src/main/protobuf</sourceDirectory>-->
-<!--                    </sourceDirectories>-->
-<!--                    &lt;!&ndash; Путь, куда будут сгенерированы файлы &ndash;&gt;-->
-<!--                    <outputDirectory>${project.build.directory}/generated-sources/protobuf</outputDirectory>-->
-<!--                    &lt;!&ndash; Подключение grpc-java для генерации кода &ndash;&gt;-->
-
-                    <binaryMavenPlugins>
-                        <binaryMavenPlugin>
-                            <groupId>io.grpc</groupId>
-                            <artifactId>protoc-gen-grpc-java</artifactId>
-                            <version>${grpc.version}</version>
-                        </binaryMavenPlugin>
-                    </binaryMavenPlugins>
-                </configuration>
-
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 
