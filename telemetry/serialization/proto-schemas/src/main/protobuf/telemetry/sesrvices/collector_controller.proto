@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package telemetry.service.collector;
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 
 import "telemetry/messages/sensor_event.proto";
