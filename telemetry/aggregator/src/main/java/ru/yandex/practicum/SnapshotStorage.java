@@ -24,7 +24,6 @@ public class SnapshotStorage {
         if (!snapshotsMap.containsKey(event.getHubId())) {
             snapshot = new SensorsSnapshotAvro();
             snapshot.setHubId(event.getHubId());
-
             snapshot.setSensorsState(new HashMap<>());
         } else {
              snapshot = snapshotsMap.get(event.getHubId());
@@ -47,7 +46,7 @@ public class SnapshotStorage {
         // снапшот нужно обновить
         SensorStateAvro newState = new SensorStateAvro();
         newState.setTimestamp(event.getTimestamp());
-        newState.setData(event);
+        newState.setData(event.getPayload());
 
         snapshot.getSensorsState().put(event.getId(), newState);
         snapshot.setTimestamp(Instant.now());
