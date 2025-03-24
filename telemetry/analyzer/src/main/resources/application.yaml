@@ -1,0 +1,28 @@
+kafka:
+  topics:
+    snapshots: "telemetry.snapshots.v1"
+    hubs: "telemetry.hubs.v1"
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  hub-consumer-properties:
+    group-id: analyzer-hub-group
+    value-deserializer: deserializer.HubEventDeserializer
+  snapshot-consumer-properties:
+    group-id: analyzer-snapshot-group
+    value-deserializer: telemetry.serialization.avro-schemas.src.main.java.deserializer.SensorsSnapshotDeserializer
+  bootstrap-servers: localhost:9092
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+spring:
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432/analyzer"
+    username: "user"
+    password: "12345"
+  jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
