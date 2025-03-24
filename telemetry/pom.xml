@@ -16,6 +16,7 @@
         <module>serialization</module>
         <module>collector</module>
         <module>hubrouter</module>
+        <module>aggregator</module>
     </modules>
 
 </project>
