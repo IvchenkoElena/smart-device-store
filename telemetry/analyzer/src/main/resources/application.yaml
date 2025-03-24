@@ -19,12 +19,22 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 
+logging:
+  level:
+    ru.yandex.practicum.telemetry: TRACE
+    org:
+      springframework: WARN
+      apache.kafka: WARN
+
+
 spring:
   datasource:
     driverClassName: "org.postgresql.Driver"
     url: "jdbc:postgresql://localhost:5432/analyzer"
-    username: "user"
+    username: "postgres"
     password: "12345"
   jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 
 sql.init.mode: always
+
+#"jakarta.persistence.jdbc.url":
