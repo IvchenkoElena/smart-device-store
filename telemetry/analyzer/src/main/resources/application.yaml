@@ -25,4 +25,6 @@ spring:
     url: "jdbc:postgresql://localhost:5432/analyzer"
     username: "user"
     password: "12345"
-  jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQLDialect
+  jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+sql.init.mode: always
