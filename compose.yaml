@@ -43,3 +43,8 @@ services:
       - POSTGRES_PASSWORD=12345
       - POSTGRES_USER=postgres
       - POSTGRES_DB=analyzer
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10

@@ -33,27 +33,16 @@ spring:
     url: "jdbc:postgresql://localhost:5432/analyzer"
     username: "postgres"
     password: "12345"
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: none # Отключение автоматического изменения структуры таблиц
+    properties:
       hibernate:
-        ddl-auto: none # Отключение автоматического изменения структуры таблиц
-      properties:
-        hibernate:
-          format_sql: true # Форматирует SQL-запросы для удобства чтения
-          show_sql: true # Показывает SQL-запросы в логах
-          jdbc:
-            lob:
-              non_contextual_creation: true # Ускорение работы с большими объектами (LOB)
-
-#  jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-
-sql.init.mode: always
-
-#jpa:
-#  hibernate:
-#    ddl-auto: none
-#  show-sql: false
-#  properties:
-#    hibernate:
-#      format_sql: true
-
-
+        format_sql: true # Форматирует SQL-запросы для удобства чтения
+        show_sql: true # Показывает SQL-запросы в логах
+        jdbc:
+          lob:
+            non_contextual_creation: true # Ускорение работы с большими объектами (LOB)
+  sql:
+    init:
+      mode: always
