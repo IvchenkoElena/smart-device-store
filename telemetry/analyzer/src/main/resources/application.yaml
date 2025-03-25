@@ -19,12 +19,12 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 
-logging:
-  level:
-    ru.yandex.practicum.telemetry: TRACE
-    org:
-      springframework: WARN
-      apache.kafka: WARN
+#logging:
+#  level:
+#    ru.yandex.practicum.telemetry: TRACE
+#    org:
+#      springframework: TRACE
+#      apache.kafka: WARN
 
 
 spring:
@@ -33,8 +33,27 @@ spring:
     url: "jdbc:postgresql://localhost:5432/analyzer"
     username: "postgres"
     password: "12345"
-  jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    jpa:
+      hibernate:
+        ddl-auto: none # Отключение автоматического изменения структуры таблиц
+      properties:
+        hibernate:
+          format_sql: true # Форматирует SQL-запросы для удобства чтения
+          show_sql: true # Показывает SQL-запросы в логах
+          jdbc:
+            lob:
+              non_contextual_creation: true # Ускорение работы с большими объектами (LOB)
+
+#  jpa.properties.hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 
 sql.init.mode: always
 
-#"jakarta.persistence.jdbc.url":
+#jpa:
+#  hibernate:
+#    ddl-auto: none
+#  show-sql: false
+#  properties:
+#    hibernate:
+#      format_sql: true
+
+

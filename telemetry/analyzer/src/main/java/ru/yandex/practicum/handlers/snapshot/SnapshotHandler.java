@@ -30,6 +30,7 @@ public class SnapshotHandler {
     private final ScenarioActionProducer scenarioActionProducer;
 
     public void handleSnapshot(SensorsSnapshotAvro sensorsSnapshot) {
+        log.info("Зашли в метод handleSnapshot");
         Map<String, SensorStateAvro> sensorStateMap = sensorsSnapshot.getSensorsState();
         List<Scenario> scenarios = scenarioRepository.findByHubId(sensorsSnapshot.getHubId());
         scenarios.stream()
@@ -104,6 +105,7 @@ public class SnapshotHandler {
     }
 
     private void sendScenarioActions(Scenario scenario) {
+        log.info("Зашли в метод sendScenarioActions");
         actionRepository.findAllByScenario(scenario).forEach(scenarioActionProducer::sendAction);
     }
 }

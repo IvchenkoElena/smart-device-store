@@ -1,5 +1,6 @@
 package ru.yandex.practicum.client;
 
+import com.google.protobuf.Empty;
 import com.google.protobuf.Timestamp;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -24,13 +25,21 @@ public class ScenarioActionProducer {
     }
 
     public void sendAction(Action action) {
+        log.info("Зашли в метод sendAction");
         DeviceActionRequest actionRequest = mapToActionRequest(action);
+        log.info("получили actionRequest");
 
-        hubRouterStub.handleDeviceAction(actionRequest);
+        Empty response = hubRouterStub.handleDeviceAction(actionRequest);
         log.info("Действие {} отправлено в hub-router", actionRequest);
+        if (response.isInitialized()) {
+            log.info("Получили ответ от хаба");
+        } else {
+            log.info("Нет ответа от хаба");
+        }
     }
 
     private DeviceActionRequest mapToActionRequest(Action action) {
+        log.info("Зашли в метод mapToActionRequest");
         return DeviceActionRequest.newBuilder()
                 .setHubId(action.getScenario().getHubId())
                 .setScenarioName(action.getScenario().getName())

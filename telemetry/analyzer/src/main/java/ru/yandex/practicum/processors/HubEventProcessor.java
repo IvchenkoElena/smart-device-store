@@ -30,6 +30,7 @@ public class HubEventProcessor implements Runnable {
     public void run() {
         try {
             hubConsumer.subscribe(List.of(hubsTopic));
+            log.info("Подписались на топик хабов");
             Runtime.getRuntime().addShutdownHook(new Thread(hubConsumer::wakeup));
             Map<String, HubEventHandler> handlerMap = handlers.getHandlers();
 
@@ -50,6 +51,7 @@ public class HubEventProcessor implements Runnable {
                 }
 
                 hubConsumer.commitSync();
+                log.info("Закомитили хаб");
             }
         } catch (WakeupException ignored) {
         } catch (Exception e) {
