@@ -44,7 +44,7 @@ public class SnapshotProcessor {
                 }
 
                 snapshotConsumer.commitSync();
-                log.info("Закомитили снапшот");
+                log.info("Хартбит снапшот");
             }
         } catch (WakeupException ignored) {
         } catch (Exception e) {

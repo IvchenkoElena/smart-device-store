@@ -51,7 +51,7 @@ public class HubEventProcessor implements Runnable {
                 }
 
                 hubConsumer.commitSync();
-                log.info("Закомитили хаб");
+                log.info("Хартбит хаб");
             }
         } catch (WakeupException ignored) {
         } catch (Exception e) {
