@@ -1,0 +1,48 @@
+kafka:
+  topics:
+    snapshots: "telemetry.snapshots.v1"
+    hubs: "telemetry.hubs.v1"
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  hub-consumer-properties:
+    group-id: analyzer-hub-group
+    value-deserializer: deserializer.HubEventDeserializer
+  snapshot-consumer-properties:
+    group-id: analyzer-snapshot-group
+    value-deserializer: telemetry.serialization.avro-schemas.src.main.java.deserializer.SensorsSnapshotDeserializer
+  bootstrap-servers: localhost:9092
+
+grpc:
+  client:
+    hub-router:
+      address: 'static://localhost:59090'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+#logging:
+#  level:
+#    ru.yandex.practicum.telemetry: TRACE
+#    org:
+#      springframework: TRACE
+#      apache.kafka: WARN
+
+
+spring:
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:5432/analyzer"
+    username: "postgres"
+    password: "12345"
+  jpa:
+    hibernate:
+      ddl-auto: none # Отключение автоматического изменения структуры таблиц
+    properties:
+      hibernate:
+        format_sql: true # Форматирует SQL-запросы для удобства чтения
+        show_sql: true # Показывает SQL-запросы в логах
+        jdbc:
+          lob:
+            non_contextual_creation: true # Ускорение работы с большими объектами (LOB)
+  sql:
+    init:
+      mode: always
