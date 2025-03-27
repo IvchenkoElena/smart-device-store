@@ -33,7 +33,6 @@ public class CollectorController extends CollectorControllerGrpc.CollectorContro
     }
 
     @Override
-//    @PostMapping("/sensors")
     public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
         log.info("Получили событие от датчика: {}", request);
         try {
@@ -58,7 +57,6 @@ public class CollectorController extends CollectorControllerGrpc.CollectorContro
     }
 
     @Override
-    //@PostMapping("/hubs")
     public void collectHubEvent(HubEventProto request, StreamObserver<Empty> responseObserver) {
         log.info("Получили событие от датчика: {}", request);
         try {

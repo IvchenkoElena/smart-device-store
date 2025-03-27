@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,9 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,6 +35,8 @@ public class AggregationStarter {
     private String inputTopic;
     @Value("${kafka.output-topic}")
     private String outputTopic;
+    private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
+
 
     /**
      * Метод для начала процесса агрегации данных.
@@ -46,29 +52,17 @@ public class AggregationStarter {
             // Цикл обработки событий
             while (true) {
                 ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(1000));
+
+                int count = 0;
                 for (ConsumerRecord<String, SensorEventAvro> record : records) {
-                    try {
-                        Optional<SensorsSnapshotAvro> mayBeSnapshot = snapshotStorage.updateState(record.value());
-
-                        if (mayBeSnapshot.isPresent()) {
-                            SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
-                            ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
-                                    new ProducerRecord<>(outputTopic, snapshot.getHubId(), snapshot);
-
-                            producer.send(producerRecord, (metadata, exception) -> {
-                                if (exception != null) {
-                                    log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
-                                } else {
-                                    log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
-                                            producerRecord, metadata.topic(), metadata.offset());
-                                }
-                            });
-                        }
-                    } catch (Exception e) {
-                        log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
-                    }
+                    // обрабатываем очередную запись
+                    handleRecord(record);
+                    // фиксируем оффсеты обработанных записей, если нужно
+                    manageOffsets(record, count, consumer);
+                    count++;
                 }
-                consumer.commitSync();
+                // фиксируем максимальный оффсет обработанных записей
+                consumer.commitAsync();
             }
 
         } catch (WakeupException ignored) {
@@ -95,6 +89,47 @@ public class AggregationStarter {
                 log.info("Закрываем продюсер");
                 producer.close();
             }
+        }
+    }
+
+    private static void manageOffsets(ConsumerRecord<String, SensorEventAvro> record, int count, KafkaConsumer<String, SensorEventAvro> consumer) {
+        // обновляем текущий оффсет для топика-партиции
+        currentOffsets.put(
+                new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1)
+        );
+
+        if(count % 10 == 0) {
+            consumer.commitAsync(currentOffsets, (offsets, exception) -> {
+                if(exception != null) {
+                    log.warn("Ошибка во время фиксации оффсетов: {}", offsets, exception);
+                }
+            });
+        }
+    }
+
+    private void handleRecord(ConsumerRecord<String, SensorEventAvro> record) throws InterruptedException {
+        log.info("топик = {}, партиция = {}, смещение = {}, значение: {}\n",
+                record.topic(), record.partition(), record.offset(), record.value());
+        try {
+            Optional<SensorsSnapshotAvro> mayBeSnapshot = snapshotStorage.updateState(record.value());
+
+            if (mayBeSnapshot.isPresent()) {
+                SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
+                ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
+                        new ProducerRecord<>(outputTopic, snapshot.getHubId(), snapshot);
+
+                producer.send(producerRecord, (metadata, exception) -> {
+                    if (exception != null) {
+                        log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
+                    } else {
+                        log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
+                                producerRecord, metadata.topic(), metadata.offset());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
         }
     }
 }
