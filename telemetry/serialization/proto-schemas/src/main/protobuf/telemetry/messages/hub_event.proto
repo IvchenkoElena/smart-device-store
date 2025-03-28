@@ -2,5 +2,91 @@ syntax = "proto3";
 
 package telemetry.message.event;
 
+import "google/protobuf/timestamp.proto";
 option java_multiple_files = true;
 option java_package = "ru.yandex.practicum.grpc.telemetry.event";
+
+message HubEventProto {
+  string hub_id = 1;                                 // идентификатор хаба
+  google.protobuf.Timestamp timestamp = 2;           // таймстемп события
+  oneof payload {                                    // содержимое конкретного события
+    DeviceAddedEventProto device_added = 3;          // данные события добавления устройства
+    DeviceRemovedEventProto device_removed = 4;      // данные события удаления устройства
+    ScenarioAddedEventProto scenario_added = 5;      // данные события добавления нового сценария
+    ScenarioRemovedEventProto scenario_removed = 6;  // данные события удаления сценария
+  }
+}
+
+// события (де)регистрации устройств
+enum DeviceTypeProto {
+  MOTION_SENSOR = 0;      // датчик движения
+  TEMPERATURE_SENSOR = 1; // датчик температуры
+  LIGHT_SENSOR = 2;       // датчик освещённости
+  CLIMATE_SENSOR = 3;     // датчик контроля климата
+  SWITCH_SENSOR = 4;      // переключатель
+}
+
+message DeviceAddedEventProto {
+  string id = 1;        // идентификатор устройства
+  DeviceTypeProto type = 2; // тип устройства
+}
+
+message DeviceRemovedEventProto {
+  string id = 1;        // идентификатор устройства
+}
+
+// события создания/удаления сценариев
+enum ConditionTypeProto {
+  MOTION = 0;
+  LUMINOSITY = 1;
+  SWITCH = 2;
+  TEMPERATURE = 3;
+  CO2LEVEL = 4;
+  HUMIDITY = 5;
+}
+
+enum ConditionOperationProto {
+  EQUALS = 0;
+  GREATER_THAN = 1;
+  LOWER_THAN = 2;
+}
+
+message ScenarioConditionProto {
+  string sensor_id = 1;
+  ConditionTypeProto type = 2;
+  ConditionOperationProto operation = 3;
+  oneof value {
+    bool bool_value = 4;
+    int32 int_value = 5;
+  }
+}
+
+enum ActionTypeProto {
+  ACTIVATE = 0;
+  DEACTIVATE = 1;
+  INVERSE = 2;
+  SET_VALUE = 3;
+}
+
+message DeviceActionProto {
+  string sensor_id = 1;                         // идентификатор устройства
+  ActionTypeProto type = 2;
+  optional int32 value = 3;
+}
+
+message ScenarioAddedEventProto {
+  string name = 1;                               // название сценария, уникальное в рамках хаба
+  repeated ScenarioConditionProto condition = 2; // набор условий активации сценария
+  repeated DeviceActionProto action = 3;         // набор действий при активации сценария
+}
+
+message ScenarioRemovedEventProto {
+  string name = 1;                               // название сценария, уникальное в рамках хаба
+}
+
+message DeviceActionRequest {
+  string hub_id = 1;
+  string scenario_name = 2;
+  DeviceActionProto action = 3;
+  google.protobuf.Timestamp timestamp = 4;
+}

@@ -1,0 +1,25 @@
+@namespace("ru.yandex.practicum.kafka.telemetry.event")
+protocol SensorsSnapshotProtocol {
+
+  // импортируем схемы, которые создали ранее
+    import idl "SensorEvent.avdl";
+
+  // Схема снапшота
+    record SensorsSnapshotAvro {
+        string hubId;                      // идентификатор хаба
+        timestamp_ms timestamp;            // метка времени снимка
+        map<SensorStateAvro> sensorsState; // набор состояний, где ключ - id устройства
+    }
+
+  // схема состояния датчика
+    record SensorStateAvro {
+        timestamp_ms timestamp;  // время отправки показаний
+        union {                  // показания конкретного датчика
+            ClimateSensorAvro,
+            LightSensorAvro,
+            MotionSensorAvro,
+            SwitchSensorAvro,
+            TemperatureSensorAvro
+        } data;
+    }
+}
