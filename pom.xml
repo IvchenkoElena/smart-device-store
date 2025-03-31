@@ -34,7 +34,7 @@
         <proto-schemas.version>1.0-SNAPSHOT</proto-schemas.version>
         <groupId>javax.validation</groupId>
         <validation-api.version>2.0.1.Final</validation-api.version>
-        <spring-cloud-dependencies.version>2023.0.3.</spring-cloud-dependencies.version>
+        <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
 
         <!--       Plugins       -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
