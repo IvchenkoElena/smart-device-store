@@ -1,9 +1,12 @@
 package ru.yandex.practicum.config;
 
 import deserializer.SensorsSnapshotDeserializer;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
@@ -11,6 +14,9 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 
 import java.util.Properties;
 
+@Getter
+@Setter
+@ConfigurationProperties("analyzer")
 @Configuration
 public class KafkaConfig {
     @Value("${kafka.bootstrap-servers}")
@@ -24,9 +30,6 @@ public class KafkaConfig {
 
     @Value("${kafka.key-deserializer}")
     private String keyDeserializer;
-
-//    @Value("${kafka.snapshot-consumer-properties.value-deserializer}")
-//    private String snapshotValueDeserializer;
 
     @Value("${kafka.hub-consumer-properties.value-deserializer}")
     private String hubValueDeserializer;

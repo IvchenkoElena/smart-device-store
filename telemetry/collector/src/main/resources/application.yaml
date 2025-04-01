@@ -1,18 +1,12 @@
 spring:
   application:
-    name: aggregator
+    name: collector
   config:
     import: configserver:http://localhost:8888
+
   cloud:
     config:
       fail-fast: true
       retry:
         useRandomPolicy: true
         max-interval: 6000
-
-logging:
-  level:
-    ru.yandex.practicum: TRACE
-    org:
-      springframework: ERROR
-      apache.kafka: ERROR
