@@ -1,6 +1,6 @@
 spring:
   application:
-    name: analyzer
+    name: collector
   config:
     import: configserver:http://localhost:8888
 
