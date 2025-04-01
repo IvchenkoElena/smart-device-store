@@ -10,3 +10,10 @@ spring:
       retry:
         useRandomPolicy: true
         max-interval: 6000
+
+logging:
+  level:
+    ru.yandex.practicum: TRACE
+    org:
+      springframework: ERROR
+      apache.kafka: ERROR

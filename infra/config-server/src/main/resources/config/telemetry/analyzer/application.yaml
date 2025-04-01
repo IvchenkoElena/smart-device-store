@@ -1,3 +1,6 @@
+application:
+  name: analyzer
+
 kafka:
   topics:
     snapshots: "telemetry.snapshots.v1"
@@ -21,13 +24,12 @@ grpc:
 
 #logging:
 #  level:
-#    ru.yandex.practicum.telemetry: TRACE
+#    ru.yandex.practicum.telemetry: DEBUG
 #    org:
 #      springframework: TRACE
 #      apache.kafka: WARN
 
-#application:
-#  name: analyzer
+
 
 spring:
   datasource:

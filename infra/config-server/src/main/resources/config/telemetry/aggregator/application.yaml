@@ -1,0 +1,16 @@
+application:
+  name: aggregator
+
+kafka:
+  bootstrap-servers: localhost:9092
+  input-topic: telemetry.sensors.v1
+  output-topic: telemetry.snapshots.v1
+  group-id: telemetry.aggregator
+
+
+#logging:
+#  level:
+#    ru.yandex.practicum: DEBUG
+#    org:
+#      springframework: ERROR
+#      apache.kafka: ERROR
