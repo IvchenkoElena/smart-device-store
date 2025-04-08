@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.yandex.practicum.dto.shoppingStore.PageableDto;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
 import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public interface ShoppingStoreOperations {
 
     @GetMapping
-    public List<ProductDto> getProducts(@RequestParam ProductCategory category, PageableDto pageable);
+    public List<ProductDto> getProducts(@RequestParam(name = "category") @NotNull ProductCategory category, Pageable pageable);
 
     @PutMapping
     public ProductDto createNewProduct(@RequestBody @Valid ProductDto productDto);
