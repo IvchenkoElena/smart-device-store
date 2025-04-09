@@ -27,7 +27,7 @@ public class ShoppingStoreController implements ShoppingStoreClient {
                 category, pageable);
         List<ProductDto> response = shoppingStoreService.getProducts(category, pageable);
         log.info("Возвращаем список товаров размером: {}", response.size());
-        log.debug("Возвращаем товары: {}", response);
+        log.info("Возвращаем товары: {}", response);
         return response;
     }
 

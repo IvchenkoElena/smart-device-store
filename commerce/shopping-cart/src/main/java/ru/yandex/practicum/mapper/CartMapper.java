@@ -3,13 +3,13 @@ package ru.yandex.practicum.mapper;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
-import ru.yandex.practicum.dto.shoppingStore.ProductDto;
-import ru.yandex.practicum.model.Product;
+import ru.yandex.practicum.dto.shoppindCart.ShoppingCartDto;
+import ru.yandex.practicum.model.ShoppingCart;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface ProductMapper {
+public interface CartMapper {
 
-    Product toProduct(ProductDto productDto);
+    ShoppingCart toCart(ShoppingCartDto cartDto);
 
-    ProductDto toProductDto(Product product);
+    ShoppingCartDto toCartDto(ShoppingCart cart);
 }
