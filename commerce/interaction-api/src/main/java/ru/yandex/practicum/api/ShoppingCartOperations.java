@@ -1,5 +1,6 @@
 package ru.yandex.practicum.api;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,5 +32,5 @@ public interface ShoppingCartOperations {
 
     @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantity(@RequestParam(name = "username") @NotNull String username,
-                                            @RequestBody ChangeProductQuantityRequest request);
+                                                 @RequestBody @Valid ChangeProductQuantityRequest request);
 }

@@ -37,6 +37,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Transactional
     @Override
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
+        log.info("Начал работать метод addProduct, на вход пришло username:{}, {}", username, products);
         validateUsername(username);
         log.info("Запрашиваем актуальную корзину для пользователя {}", username);
         ShoppingCart cart = getOrCreateShoppingCart(username);

@@ -35,6 +35,7 @@
         <groupId>javax.validation</groupId>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <spring-cloud-dependencies.version>2023.0.3</spring-cloud-dependencies.version>
+        <project.org.mapstruct.mapstruct.version>1.6.0</project.org.mapstruct.mapstruct.version>
 
         <!--       Plugins       -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -127,8 +128,21 @@
                 <version>${grpc.version}</version>
             </dependency>
 
-            <!--    / GRPC dependencies management        -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${project.org.mapstruct.mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${project.org.mapstruct.mapstruct.version}</version>
+            </dependency>
+
+
         </dependencies>
+
+
     </dependencyManagement>
 
     <build>
