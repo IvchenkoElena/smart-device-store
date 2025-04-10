@@ -18,6 +18,20 @@ public class ErrorHandler {
         return new ApiError(HttpStatus.NOT_FOUND, "Product not found", e.getMessage());
     }
 
+    @ExceptionHandler({NoProductsInShoppingCartException. class, SpecifiedProductAlreadyInWarehouseException.class, ProductInShoppingCartLowQuantityInWarehouse.class, NoSpecifiedProductInWarehouseException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleBadRequestException(RuntimeException e) {
+        log.warn("400 - BAD_REQUEST");
+        return new ApiError(HttpStatus.BAD_REQUEST, "Bad request", e.getMessage());
+    }
+
+    @ExceptionHandler({NotAuthorizedUserException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiError handleUnauthorizedException(RuntimeException e) {
+        log.warn("401 - Unauthorized");
+        return new ApiError(HttpStatus.UNAUTHORIZED, "Unauthorized", e.getMessage());
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiError handleInternalServerError(RuntimeException e) {

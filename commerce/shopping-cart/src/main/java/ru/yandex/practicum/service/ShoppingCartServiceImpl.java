@@ -80,7 +80,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         ShoppingCart cart = getOrCreateShoppingCart(username);
         checkCartIsActive(cart);
         Map<UUID, Integer> oldProducts = cart.getProducts();
-        products.forEach(oldProducts::remove);
+        for (UUID idToRemove : products) {
+            if (oldProducts.containsKey(idToRemove)) {
+                oldProducts.remove(idToRemove);
+            } else {
+                throw new NoProductsInShoppingCartException("Такого продукта нет в корзине");
+            }
+        }
         cart.setProducts(oldProducts);
         log.info("Удалили продукты из корзины");
         cartRepository.save(cart);

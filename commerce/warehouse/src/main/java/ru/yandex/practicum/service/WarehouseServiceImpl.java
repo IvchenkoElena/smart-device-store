@@ -10,6 +10,7 @@ import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
+import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.mapper.WarehouseMapper;
 import ru.yandex.practicum.model.WarehouseProduct;
@@ -70,9 +71,7 @@ public class WarehouseServiceImpl implements WarehouseService {
                 }
             } else {String message = "Количества продукта " + availableProduct.getProductId() + " недостаточно на складе. Уменьшите количество продукта до " + availableProduct.getQuantity();
                 log.info(message);
-                //throw new ProductInShoppingCartLowQuantityInWarehouse(message);
-                //закомментировала выброс ошибки, чтобы тесты проходили.
-                //но правильнее будет ошибку в этом случае выбросить, чтоб метод на этом прервался?
+                throw new ProductInShoppingCartLowQuantityInWarehouse(message);
             }
         }
         log.info("Параметры заказа: {}", bookedProductsDto);
