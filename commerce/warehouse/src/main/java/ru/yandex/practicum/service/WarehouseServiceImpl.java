@@ -4,7 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.api.ShoppingStoreOperations;
 import ru.yandex.practicum.dto.shoppindCart.ShoppingCartDto;
+import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
+import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -31,6 +35,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final AddressDto warehouseAddress = initAddress();
+    private final ShoppingStoreOperations shoppingStoreClient;
 
     @Transactional
     @Override
@@ -85,10 +90,32 @@ public class WarehouseServiceImpl implements WarehouseService {
         WarehouseProduct product = warehouseRepository.findById(request.getProductId())
                         .orElseThrow(() -> new NoSpecifiedProductInWarehouseException("Такого товара нет в перечне товаров на складе:" + request.getProductId()));
         Integer oldQuantity = product.getQuantity();
-        product.setQuantity(oldQuantity + request.getQuantity());
+        Integer newQuantity = oldQuantity + request.getQuantity();
+        product.setQuantity(newQuantity);
         warehouseRepository.save(product);
         log.info("Приняли товар на склад");
 
+        log.info("Проверяем, есть ли товар в магазине");
+        ProductDto productDto;
+        try {
+            productDto = shoppingStoreClient.getProduct(product.getProductId());
+            QuantityState quantityState;
+            if (newQuantity > 100) {
+                quantityState = QuantityState.MANY;
+            } else if (newQuantity > 10) {
+                quantityState = QuantityState.ENOUGH;
+            } else if (newQuantity > 0) {
+                quantityState = QuantityState.FEW;
+            } else {
+                quantityState = QuantityState.ENDED;
+            }
+            SetProductQuantityStateRequest stateRequest = new SetProductQuantityStateRequest(product.getProductId(), quantityState);
+            log.info("Обновляем количество товара в магазине");
+            shoppingStoreClient.setProductQuantityState(stateRequest);
+            log.info("Обновили количество товара в магазине");
+        } catch (RuntimeException e) {
+            log.info("Такого товара нет в магазине");
+        }
     }
 
     @Override

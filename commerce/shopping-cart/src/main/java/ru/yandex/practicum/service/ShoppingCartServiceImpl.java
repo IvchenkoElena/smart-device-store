@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.api.WarehouseOperations;
 import ru.yandex.practicum.dto.shoppindCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppindCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.DeactivateCartException;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
-import ru.yandex.practicum.feign.WarehouseClient;
 import ru.yandex.practicum.mapper.CartMapper;
 import ru.yandex.practicum.model.ShoppingCart;
 import ru.yandex.practicum.repository.CartRepository;
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
-    private final WarehouseClient warehouseClient;
+    private final WarehouseOperations warehouseClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -109,6 +109,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
         cart.setProducts(oldProducts);
         log.info("Изменили количество продукта в корзине");
+
+        //проверить товары на складе
+        BookedProductsDto bookedProductsDto = warehouseClient.checkProductQuantityEnoughForShoppingCart(cartMapper.toCartDto(cart));
+        log.info("Проверили наличие товаров на складе, параметры заказа: {}", bookedProductsDto);
+        
         cartRepository.save(cart);
         log.info("Сохранили обновленную корзину");
         return cartMapper.toCartDto(cart);

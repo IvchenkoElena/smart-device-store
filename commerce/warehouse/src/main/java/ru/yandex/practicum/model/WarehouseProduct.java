@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,13 +18,9 @@ public class WarehouseProduct {
     @Column(name = "product_id")
     private UUID productId;
     private Boolean fragile;
-    @NotNull
     private Double width;
-    @NotNull
     private Double height;
-    @NotNull
     private Double depth;
-    @NotNull
     private Double weight;
     private Integer quantity = 0;
 }
