@@ -9,6 +9,7 @@ spring:
         native:
           searchLocations:
             - classpath:config/telemetry/{application}
+            - classpath:config/commerce/{application}
 
 server:
   port: 0
