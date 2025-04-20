@@ -16,14 +16,14 @@ import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 public interface WarehouseOperations {
 
     @PutMapping
-    public void newProductInWarehouse(@RequestBody @Valid NewProductInWarehouseRequest request);
+    void newProductInWarehouse(@RequestBody @Valid NewProductInWarehouseRequest request);
 
     @PostMapping("/check")
-    public BookedProductsDto checkProductQuantityEnoughForShoppingCart (@RequestBody @Valid ShoppingCartDto cartDto);
+    BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody @Valid ShoppingCartDto cartDto);
 
     @PostMapping("/add")
-    public void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request);
+    void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request);
 
     @GetMapping("/address")
-    public AddressDto getWarehouseAddress();
+    AddressDto getWarehouseAddress();
 }

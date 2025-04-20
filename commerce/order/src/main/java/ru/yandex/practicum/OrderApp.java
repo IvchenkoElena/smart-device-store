@@ -2,13 +2,13 @@ package ru.yandex.practicum;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.config.server.EnableConfigServer;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EnableConfigServer
+@EnableFeignClients
+//        (clients = {WarehouseOperations.class})
 @SpringBootApplication
-public class ConfigServer {
+public class OrderApp {
     public static void main(String[] args) {
-        SpringApplication.run(ConfigServer.class, args);
+        SpringApplication.run(OrderApp.class, args);
     }
-
 }

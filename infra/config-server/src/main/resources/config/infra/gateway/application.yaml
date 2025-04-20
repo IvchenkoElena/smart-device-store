@@ -34,3 +34,9 @@ spring:
                   maxBackoff: 2s
                   factor: 2
                   basedOnPreviousValue: true
+        - id: warehouse_service_route
+          uri: lb://warehouse
+          predicates:
+            - Path=/warehouse/**
+          filters:
+            - PrefixPath=/api/v1
