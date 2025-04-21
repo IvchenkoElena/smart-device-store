@@ -12,19 +12,19 @@ import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 @FeignClient(name = "order", path = "/api/v1/order")
 public interface OrderOperations {
     @GetMapping
-    OrderDto getClientOrders(@RequestParam(name = "username") @NotNull String username);
+    List<OrderDto> getClientOrders(@RequestParam(name = "username") @NotNull String username);
 
     @PutMapping
     OrderDto createNewOrder(@RequestBody @Valid CreateNewOrderRequest request);
 
     @PostMapping("/return")
-    OrderDto productReturn(@RequestParam @NotNull ProductReturnRequest request,
-                           @RequestBody @Valid ProductReturnRequest request1);
+    OrderDto productReturn(@RequestBody @Valid ProductReturnRequest request);
 
     @PostMapping("/payment")
     OrderDto payment(@RequestBody @NotNull UUID orderId);

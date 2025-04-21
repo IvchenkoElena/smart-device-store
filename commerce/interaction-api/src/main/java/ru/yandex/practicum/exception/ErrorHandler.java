@@ -18,7 +18,7 @@ public class ErrorHandler {
         return new ApiError(HttpStatus.NOT_FOUND, "Product not found", e.getMessage());
     }
 
-    @ExceptionHandler({NoProductsInShoppingCartException. class, SpecifiedProductAlreadyInWarehouseException.class, ProductInShoppingCartLowQuantityInWarehouse.class, NoSpecifiedProductInWarehouseException.class})
+    @ExceptionHandler({NoProductsInShoppingCartException. class, SpecifiedProductAlreadyInWarehouseException.class, ProductInShoppingCartLowQuantityInWarehouse.class, NoSpecifiedProductInWarehouseException.class, NoOrderFoundException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleBadRequestException(RuntimeException e) {
         log.warn("400 - BAD_REQUEST");
