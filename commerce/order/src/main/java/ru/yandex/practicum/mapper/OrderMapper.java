@@ -14,6 +14,7 @@ public interface OrderMapper {
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "products", source = "request.shoppingCart.products")
     @Mapping(target = "shoppingCartId", source = "request.shoppingCart.cartId")
+    @Mapping(target = "username", source = "request.username")
     @Mapping(target = "deliveryWeight", source = "bookedProductsDto.deliveryWeight")
     @Mapping(target = "deliveryVolume", source = "bookedProductsDto.deliveryVolume")
     @Mapping(target = "fragile", source = "bookedProductsDto.fragile")

@@ -13,4 +13,8 @@ public class CreateNewOrderRequest {
 
     @NotNull
     private AddressDto deliveryAddress;
+
+    @NotNull
+    private String username;
+    // решила добавить это поле, так как неоткуда больше взять имя пользователя
 }

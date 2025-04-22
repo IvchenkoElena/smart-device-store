@@ -41,6 +41,8 @@ public class Order {
     private Map<UUID, Integer> products;
     @Column(name = "shopping_cart_id")
     private UUID shoppingCartId;
+    private String username;
+    // добавила это поле, чтобы можно было осуществлять поиск по имени пользователя
     @Column(name = "payment_id")
     private UUID paymentId;
     @Column(name = "delivery_id")
