@@ -25,7 +25,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "order.orders")
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,7 +35,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderState orderState = OrderState.NEW;
     @ElementCollection
-    @CollectionTable(name = "cart.cart_products", joinColumns = @JoinColumn(name = "cart_id"))
+    @CollectionTable(name = "order_products", joinColumns = @JoinColumn(name = "order_id"))
     @MapKeyColumn(name = "product_id")
     @Column(name = "quantity")
     private Map<UUID, Integer> products;

@@ -58,6 +58,8 @@ public class OrderServiceImpl implements OrderService {
         // NoSpecifiedProductInWarehouseException 400
         // только ее? а если недостаточно товара?
         Order newOrder = orderMapper.toOrder(request, bookedProductsDto);
+        // добавила поле username в CreateNewOrderRequest.
+        // Может правильнее было бы здесь сходить в Shopping-Cart клиент и спросить имя клиента по ID корзины?
         newOrder = orderRepository.save(newOrder);
         log.info("Сохранили новый заказ в БД: {}", newOrder);
         return orderMapper.toOrderDto(newOrder);
