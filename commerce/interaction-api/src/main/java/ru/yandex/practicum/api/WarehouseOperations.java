@@ -1,5 +1,6 @@
 package ru.yandex.practicum.api;
 
+import feign.FeignException;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public interface WarehouseOperations {
     void newProductInWarehouse(@RequestBody @Valid NewProductInWarehouseRequest request);
 
     @PostMapping("/check")
-    BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody @Valid ShoppingCartDto cartDto);
+    BookedProductsDto checkProductQuantityEnoughForShoppingCart(@RequestBody @Valid ShoppingCartDto cartDto) throws FeignException;
 
     @PostMapping("/add")
     void addProductToWarehouse(@RequestBody @Valid AddProductToWarehouseRequest request);
