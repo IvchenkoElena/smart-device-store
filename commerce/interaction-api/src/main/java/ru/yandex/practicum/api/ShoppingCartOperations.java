@@ -35,4 +35,7 @@ public interface ShoppingCartOperations {
     @PostMapping("/change-quantity")
     ShoppingCartDto changeProductQuantity(@RequestParam(name = "username") @NotNull String username,
                                           @RequestBody @Valid ChangeProductQuantityRequest request);
+
+    @GetMapping("/name")
+    String getUsernameById(@RequestParam @NotNull UUID cartId);
 }

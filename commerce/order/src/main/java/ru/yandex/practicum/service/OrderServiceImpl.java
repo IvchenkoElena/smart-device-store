@@ -1,9 +1,11 @@
 package ru.yandex.practicum.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.api.ShoppingCartOperations;
 import ru.yandex.practicum.api.WarehouseOperations;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
@@ -11,8 +13,11 @@ import ru.yandex.practicum.dto.order.OrderState;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
+import ru.yandex.practicum.exception.NoCartException;
 import ru.yandex.practicum.exception.NoOrderFoundException;
+import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
+import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.mapper.OrderMapper;
 import ru.yandex.practicum.model.Order;
 import ru.yandex.practicum.repository.OrderRepository;
@@ -29,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final WarehouseOperations warehouseClient;
+    private final ShoppingCartOperations shoppingCartClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -52,14 +58,37 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto createNewOrder(CreateNewOrderRequest request) {
         log.info("Создаем новый заказ: shoppingCartId {}, products {}", request.getShoppingCart().getCartId(), request.getShoppingCart().getProducts());
-        BookedProductsDto bookedProductsDto = warehouseClient.checkProductQuantityEnoughForShoppingCart(request.getShoppingCart());
-        log.info("Проверили наличие товаров на складе, параметры заказа: {}", bookedProductsDto);
-        // пробросить ошибку из feign клиента, если товара нет на складе (как?)
-        // NoSpecifiedProductInWarehouseException 400
-        // только ее? а если недостаточно товара?
-        Order newOrder = orderMapper.toOrder(request, bookedProductsDto);
-        // добавила поле username в CreateNewOrderRequest.
-        // Может правильнее было бы здесь сходить в Shopping-Cart клиент и спросить имя клиента по ID корзины?
+        BookedProductsDto bookedProductsDto;
+        try {
+            bookedProductsDto = warehouseClient.checkProductQuantityEnoughForShoppingCart(request.getShoppingCart());
+            log.info("Проверили наличие товаров на складе, параметры заказа: {}", bookedProductsDto);
+        } catch (FeignException e) {
+            if (e.status() == 400) {
+                throw new ProductInShoppingCartLowQuantityInWarehouse(e.getMessage());
+            } else if (e.status() == 404) {
+                throw new NoSpecifiedProductInWarehouseException(e.getMessage());
+            } else {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+        // пыталась реализовать проброс ошибок из фейн-клиента
+        // мысль была в том, что это две разные ошибки, и они должны по-разному пробрасываться
+        // чтобы их различать сделала им разные статусы (не знаю, можно ли было по-другому как-то придать им отличие)
+        // хотя по спецификации NoSpecifiedProductInWarehouseException тоже должен давать 400 ответ
+        // думаю, не совсем верно все это реализовала
+
+        String username;
+        try {
+            username = shoppingCartClient.getUsernameById(request.getShoppingCart().getCartId());
+            log.info("Нашли имя пользователя {}", username);
+        } catch (FeignException e) {
+            if (e.status() == 400) {
+                throw new NoCartException(e.getMessage());
+            } else {
+                throw new RuntimeException(e.getMessage());
+            }
+        }
+        Order newOrder = orderMapper.toOrder(request, bookedProductsDto, username);
         newOrder = orderRepository.save(newOrder);
         log.info("Сохранили новый заказ в БД: {}", newOrder);
         return orderMapper.toOrderDto(newOrder);
