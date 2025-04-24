@@ -32,18 +32,26 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto createNewOrder(CreateNewOrderRequest request) {
-        log.info("PUT /api/v1/order - Создать новый заказ в системе: request={}",
-                request);
+        log.info("PUT /api/v1/order - Создать новый заказ в системе: request={}", request);
         OrderDto response = orderService.createNewOrder(request);
         log.info("Возвращаем заказ: {}", response);
         return response;
     }
 
     @Override
-    public OrderDto productReturn(ProductReturnRequest request) {
-        log.info("POST /api/v1/order/return - Возврат заказа: request={}",
-                request);
-        OrderDto response = orderService.productReturn(request);
+    public OrderDto calculateDeliveryCost(UUID orderId) {
+        log.info("POST /api/v1/order/calculate/delivery - Расчёт стоимости доставки заказа: orderId={}",
+                orderId);
+        OrderDto response = orderService.calculateDeliveryCost(orderId);
+        log.info("Возвращаем заказ: {}", response);
+        return response;
+    }
+
+    @Override
+    public OrderDto calculateTotalCost(UUID orderId) {
+        log.info("POST /api/v1/order/calculate/total - Расчёт стоимости заказа: orderId={}",
+                orderId);
+        OrderDto response = orderService.calculateTotalCost(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
     }
@@ -62,6 +70,24 @@ public class OrderController implements OrderOperations {
         log.info("POST /api/v1/order/payment/failed - Оплата заказа произошла с ошибкой: orderId={}",
                 orderId);
         OrderDto response = orderService.paymentFailed(orderId);
+        log.info("Возвращаем заказ: {}", response);
+        return response;
+    }
+
+    @Override
+    public OrderDto assembly(UUID orderId) {
+        log.info("POST /api/v1/order/assembly - Сборка заказа: orderId={}",
+                orderId);
+        OrderDto response = orderService.assembly(orderId);
+        log.info("Возвращаем заказ: {}", response);
+        return response;
+    }
+
+    @Override
+    public OrderDto assemblyFailed(UUID orderId) {
+        log.info("POST /api/v1/order/assembly/failed - Сборка заказа произошла с ошибкой: orderId={}",
+                orderId);
+        OrderDto response = orderService.assemblyFailed(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
     }
@@ -94,37 +120,10 @@ public class OrderController implements OrderOperations {
     }
 
     @Override
-    public OrderDto calculateTotalCost(UUID orderId) {
-        log.info("POST /api/v1/order/calculate/total - Расчёт стоимости заказа: orderId={}",
-                orderId);
-        OrderDto response = orderService.calculateTotalCost(orderId);
-        log.info("Возвращаем заказ: {}", response);
-        return response;
-    }
-
-    @Override
-    public OrderDto calculateDeliveryCost(UUID orderId) {
-        log.info("POST /api/v1/order/calculate/delivery - Расчёт стоимости доставки заказа: orderId={}",
-                orderId);
-        OrderDto response = orderService.calculateDeliveryCost(orderId);
-        log.info("Возвращаем заказ: {}", response);
-        return response;
-    }
-
-    @Override
-    public OrderDto assembly(UUID orderId) {
-        log.info("POST /api/v1/order/assembly - Сборка заказа: orderId={}",
-                orderId);
-        OrderDto response = orderService.assembly(orderId);
-        log.info("Возвращаем заказ: {}", response);
-        return response;
-    }
-
-    @Override
-    public OrderDto assemblyFailed(UUID orderId) {
-        log.info("POST /api/v1/order/assembly/failed - Сборка заказа произошла с ошибкой: orderId={}",
-                orderId);
-        OrderDto response = orderService.assemblyFailed(orderId);
+    public OrderDto productReturn(ProductReturnRequest request) {
+        log.info("POST /api/v1/order/return - Возврат заказа: request={}",
+                request);
+        OrderDto response = orderService.productReturn(request);
         log.info("Возвращаем заказ: {}", response);
         return response;
     }

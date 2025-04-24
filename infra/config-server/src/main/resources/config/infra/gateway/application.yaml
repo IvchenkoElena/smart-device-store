@@ -46,3 +46,9 @@ spring:
             - Path=/order/**
           filters:
             - PrefixPath=/api/v1
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - PrefixPath=/api/v1

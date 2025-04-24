@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.api.PaymentOperations;
 import ru.yandex.practicum.api.ShoppingCartOperations;
 import ru.yandex.practicum.api.WarehouseOperations;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.OrderState;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
+import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.NoCartException;
@@ -35,6 +37,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final WarehouseOperations warehouseClient;
     private final ShoppingCartOperations shoppingCartClient;
+    private final PaymentOperations paymentClient;
+//    private final DeliveryOperations deliveryClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -96,22 +100,40 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public OrderDto productReturn(ProductReturnRequest request) {
-        log.info("Создан запрос на возврат заказа OrderId: {}, products: {}", request.getOrderId(), request.getProducts());
-        Order orderToReturn = orderRepository.findById(request.getOrderId())
-                        .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + request.getOrderId()));
-        Map<UUID, Integer> productsToReturn = request.getProducts();
-        Set<UUID> ids = productsToReturn.keySet();
-        for (UUID id : ids) {
-            AddProductToWarehouseRequest addProductToWarehouseRequest = new AddProductToWarehouseRequest(id, productsToReturn.get(id));
-            warehouseClient.addProductToWarehouse(addProductToWarehouseRequest);
-        }
-        log.info("Вернули на склад товары из заказа: OrderId {}, products {}", request.getOrderId(), request.getProducts());
-        orderToReturn.setOrderState(OrderState.PRODUCT_RETURNED);
-        log.info("Изменили статус заказа на PRODUCT_RETURNED: OrderId {}", request.getOrderId());
-        orderToReturn = orderRepository.save(orderToReturn);
-        log.info("Сохранили изменения в БД: {}", orderToReturn);
-        return orderMapper.toOrderDto(orderToReturn);
+    public OrderDto calculateDeliveryCost(UUID orderId) {
+        log.info("Обрабатываем вычисление стоимости доставки заказа OrderId: {}", orderId);
+        Order orderToCalculate = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
+        //вычислить и задать поля
+        Double productCost = paymentClient.productCost(orderMapper.toOrderDto(orderToCalculate));
+        orderToCalculate.setProductPrice(productCost);
+//        Double deliveryCost = deliveryClient.deliveryCost(orderMapper.toOrderDto(orderToCalculate));
+        Double deliveryCost = 20.0;
+        orderToCalculate.setDeliveryPrice(deliveryCost);
+
+        orderToCalculate = orderRepository.save(orderToCalculate);
+        log.info("Сохранили изменения в БД: {}", orderToCalculate);
+        return orderMapper.toOrderDto(orderToCalculate);
+    }
+
+    @Transactional
+    @Override
+    public OrderDto calculateTotalCost(UUID orderId) {
+        log.info("Обрабатываем вычисление общей стоимости заказа OrderId: {}", orderId);
+        Order orderToCalculate = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
+        //вычислить и задать поле
+        Double totalCost = paymentClient.getTotalCost(orderMapper.toOrderDto(orderToCalculate));
+        orderToCalculate.setTotalPrice(totalCost);
+
+        // когда мы используем статус ON_PAYMENT??? Может тут? ли не нужно совсем?
+        orderToCalculate.setOrderState(OrderState.ON_PAYMENT);
+        PaymentDto paymentDto =  paymentClient.payment(orderMapper.toOrderDto(orderToCalculate));
+        orderToCalculate.setPaymentId(paymentDto.getPaymentId());
+
+        orderToCalculate = orderRepository.save(orderToCalculate);
+        log.info("Сохранили изменения в БД: {}", orderToCalculate);
+        return orderMapper.toOrderDto(orderToCalculate);
     }
 
     @Transactional
@@ -120,11 +142,6 @@ public class OrderServiceImpl implements OrderService {
         log.info("Обрабатываем успешный платеж по заказу OrderId: {}", orderId);
         Order orderToPay = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
-        // когда мы используем статус ON_PAYMENT???
-//        orderToPay.setOrderState(OrderState.ON_PAYMENT);
-//        log.info("Изменили статус заказа на ON_PAYMENT: OrderId {}", orderId);
-        //создать payment, внести ее ID
-        //log.info("Ва: OrderId {}, products {}", request.getOrderId(), request.getProducts());
         orderToPay.setOrderState(OrderState.PAID);
         log.info("Изменили статус заказа на PAID: OrderId {}", orderId);
         orderToPay = orderRepository.save(orderToPay);
@@ -138,8 +155,6 @@ public class OrderServiceImpl implements OrderService {
         log.info("Обрабатываем ошибку оплаты заказа OrderId: {}", orderId);
         Order orderToPay = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
-        //создать payment, внести ее ID
-        //log.info("Ва: OrderId {}, products {}", request.getOrderId(), request.getProducts());
         orderToPay.setOrderState(OrderState.PAYMENT_FAILED);
         log.info("Изменили статус заказа на PAYMENT_FAILED: OrderId {}", orderId);
         orderToPay = orderRepository.save(orderToPay);
@@ -149,8 +164,35 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
+    public OrderDto assembly(UUID orderId) {
+        log.info("Обрабатываем успешную сборку заказа OrderId: {}", orderId);
+        Order orderToAssembly = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
+        orderToAssembly.setOrderState(OrderState.ASSEMBLED);
+        log.info("Изменили статус заказа на ASSEMBLED: OrderId {}", orderId);
+        orderToAssembly = orderRepository.save(orderToAssembly);
+        log.info("Сохранили изменения в БД: {}", orderToAssembly);
+        return orderMapper.toOrderDto(orderToAssembly);
+    }
+
+    @Transactional
+    @Override
+    public OrderDto assemblyFailed(UUID orderId) {
+        log.info("Обрабатываем ошибку сборки по заказу OrderId: {}", orderId);
+        Order orderToAssembly = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
+        orderToAssembly.setOrderState(OrderState.ASSEMBLY_FAILED);
+        log.info("Изменили статус заказа на ASSEMBLY_FAILED: OrderId {}", orderId);
+        orderToAssembly = orderRepository.save(orderToAssembly);
+        log.info("Сохранили изменения в БД: {}", orderToAssembly);
+        return orderMapper.toOrderDto(orderToAssembly);
+    }
+
+    @Transactional
+    @Override
     public OrderDto delivery(UUID orderId) {
         log.info("Обрабатываем успешную доставку по заказу OrderId: {}", orderId);
+        // когда мы используем статус ON_DELIVERY??? Совсем негде получается
         Order orderToDeliver = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
         orderToDeliver.setOrderState(OrderState.DELIVERED);
@@ -188,55 +230,21 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public OrderDto calculateTotalCost(UUID orderId) {
-        log.info("Обрабатываем вычисление общей стоимости заказа OrderId: {}", orderId);
-        Order orderToCalculate = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
-
-        //вычислить и задать поле
-
-        orderToCalculate = orderRepository.save(orderToCalculate);
-        log.info("Сохранили изменения в БД: {}", orderToCalculate);
-        return orderMapper.toOrderDto(orderToCalculate);
-    }
-
-    @Transactional
-    @Override
-    public OrderDto calculateDeliveryCost(UUID orderId) {
-        log.info("Обрабатываем вычисление стоимости доставки заказа OrderId: {}", orderId);
-        Order orderToCalculate = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
-
-        //вычислить и задать поле
-
-        orderToCalculate = orderRepository.save(orderToCalculate);
-        log.info("Сохранили изменения в БД: {}", orderToCalculate);
-        return orderMapper.toOrderDto(orderToCalculate);
-    }
-
-    @Transactional
-    @Override
-    public OrderDto assembly(UUID orderId) {
-        log.info("Обрабатываем успешную сборку заказа OrderId: {}", orderId);
-        Order orderToAssembly = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
-        orderToAssembly.setOrderState(OrderState.ASSEMBLED);
-        log.info("Изменили статус заказа на ASSEMBLED: OrderId {}", orderId);
-        orderToAssembly = orderRepository.save(orderToAssembly);
-        log.info("Сохранили изменения в БД: {}", orderToAssembly);
-        return orderMapper.toOrderDto(orderToAssembly);
-    }
-
-    @Transactional
-    @Override
-    public OrderDto assemblyFailed(UUID orderId) {
-        log.info("Обрабатываем ошибку сборки по заказу OrderId: {}", orderId);
-        Order orderToAssembly = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + orderId));
-        orderToAssembly.setOrderState(OrderState.ASSEMBLY_FAILED);
-        log.info("Изменили статус заказа на ASSEMBLY_FAILED: OrderId {}", orderId);
-        orderToAssembly = orderRepository.save(orderToAssembly);
-        log.info("Сохранили изменения в БД: {}", orderToAssembly);
-        return orderMapper.toOrderDto(orderToAssembly);
+    public OrderDto productReturn(ProductReturnRequest request) {
+        log.info("Создан запрос на возврат заказа OrderId: {}, products: {}", request.getOrderId(), request.getProducts());
+        Order orderToReturn = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new NoOrderFoundException("Такого заказа нет в базе: " + request.getOrderId()));
+        Map<UUID, Integer> productsToReturn = request.getProducts();
+        Set<UUID> ids = productsToReturn.keySet();
+        for (UUID id : ids) {
+            AddProductToWarehouseRequest addProductToWarehouseRequest = new AddProductToWarehouseRequest(id, productsToReturn.get(id));
+            warehouseClient.addProductToWarehouse(addProductToWarehouseRequest);
+        }
+        log.info("Вернули на склад товары из заказа: OrderId {}, products {}", request.getOrderId(), request.getProducts());
+        orderToReturn.setOrderState(OrderState.PRODUCT_RETURNED);
+        log.info("Изменили статус заказа на PRODUCT_RETURNED: OrderId {}", request.getOrderId());
+        orderToReturn = orderRepository.save(orderToReturn);
+        log.info("Сохранили изменения в БД: {}", orderToReturn);
+        return orderMapper.toOrderDto(orderToReturn);
     }
 }
