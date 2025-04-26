@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.api.DeliveryOperations;
 import ru.yandex.practicum.api.PaymentOperations;
 import ru.yandex.practicum.api.ShoppingCartOperations;
 import ru.yandex.practicum.api.WarehouseOperations;
+import ru.yandex.practicum.dto.delivery.DeliveryDto;
+import ru.yandex.practicum.dto.delivery.DeliveryState;
 import ru.yandex.practicum.dto.order.CreateNewOrderRequest;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.order.OrderState;
@@ -38,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
     private final WarehouseOperations warehouseClient;
     private final ShoppingCartOperations shoppingCartClient;
     private final PaymentOperations paymentClient;
-//    private final DeliveryOperations deliveryClient;
+    private final DeliveryOperations deliveryClient;
 
     @Transactional(readOnly = true)
     @Override
@@ -94,6 +97,19 @@ public class OrderServiceImpl implements OrderService {
         }
         Order newOrder = orderMapper.toOrder(request, bookedProductsDto, username);
         newOrder = orderRepository.save(newOrder);
+
+        // тут задать DeliveryId ?
+
+        DeliveryDto deliveryDto = new DeliveryDto();
+        deliveryDto.setFromAddress(warehouseClient.getWarehouseAddress());
+        deliveryDto.setToAddress(request.getDeliveryAddress());
+        deliveryDto.setOrderId(newOrder.getOrderId());
+        deliveryDto.setDeliveryState(DeliveryState.CREATED);
+
+        DeliveryDto newDeliveryDto = deliveryClient.planDelivery(deliveryDto);
+
+        newOrder.setDeliveryId(newDeliveryDto.getDeliveryId());
+        newOrder = orderRepository.save(newOrder);
         log.info("Сохранили новый заказ в БД: {}", newOrder);
         return orderMapper.toOrderDto(newOrder);
     }
@@ -107,8 +123,7 @@ public class OrderServiceImpl implements OrderService {
         //вычислить и задать поля
         Double productCost = paymentClient.productCost(orderMapper.toOrderDto(orderToCalculate));
         orderToCalculate.setProductPrice(productCost);
-//        Double deliveryCost = deliveryClient.deliveryCost(orderMapper.toOrderDto(orderToCalculate));
-        Double deliveryCost = 20.0;
+        Double deliveryCost = deliveryClient.deliveryCost(orderMapper.toOrderDto(orderToCalculate));
         orderToCalculate.setDeliveryPrice(deliveryCost);
 
         orderToCalculate = orderRepository.save(orderToCalculate);

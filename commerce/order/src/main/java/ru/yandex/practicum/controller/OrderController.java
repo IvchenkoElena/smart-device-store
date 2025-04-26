@@ -40,8 +40,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto calculateDeliveryCost(UUID orderId) {
-        log.info("POST /api/v1/order/calculate/delivery - Расчёт стоимости доставки заказа: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/calculate/delivery - Расчёт стоимости доставки заказа: orderId={}", orderId);
         OrderDto response = orderService.calculateDeliveryCost(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -49,8 +48,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto calculateTotalCost(UUID orderId) {
-        log.info("POST /api/v1/order/calculate/total - Расчёт стоимости заказа: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/calculate/total - Расчёт стоимости заказа: orderId={}", orderId);
         OrderDto response = orderService.calculateTotalCost(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -58,8 +56,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto payment(UUID orderId) {
-        log.info("POST /api/v1/order/payment - Оплата заказа: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/payment - Оплата заказа: orderId={}", orderId);
         OrderDto response = orderService.payment(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -67,8 +64,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto paymentFailed(UUID orderId) {
-        log.info("POST /api/v1/order/payment/failed - Оплата заказа произошла с ошибкой: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/payment/failed - Оплата заказа произошла с ошибкой: orderId={}", orderId);
         OrderDto response = orderService.paymentFailed(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -76,8 +72,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto assembly(UUID orderId) {
-        log.info("POST /api/v1/order/assembly - Сборка заказа: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/assembly - Сборка заказа: orderId={}", orderId);
         OrderDto response = orderService.assembly(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -85,8 +80,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto assemblyFailed(UUID orderId) {
-        log.info("POST /api/v1/order/assembly/failed - Сборка заказа произошла с ошибкой: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/assembly/failed - Сборка заказа произошла с ошибкой: orderId={}", orderId);
         OrderDto response = orderService.assemblyFailed(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -94,8 +88,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto delivery(UUID orderId) {
-        log.info("POST /api/v1/order/delivery - Доставка заказа: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/delivery - Доставка заказа: orderId={}", orderId);
         OrderDto response = orderService.delivery(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -103,8 +96,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto deliveryFailed(UUID orderId) {
-        log.info("POST /api/v1/order/delivery/failed - Доставка заказа произошла с ошибкой: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/delivery/failed - Доставка заказа произошла с ошибкой: orderId={}", orderId);
         OrderDto response = orderService.deliveryFailed(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -112,8 +104,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto complete(UUID orderId) {
-        log.info("POST /api/v1/order/completed - Завершение заказа: orderId={}",
-                orderId);
+        log.info("POST /api/v1/order/completed - Завершение заказа: orderId={}", orderId);
         OrderDto response = orderService.complete(orderId);
         log.info("Возвращаем заказ: {}", response);
         return response;
@@ -121,8 +112,7 @@ public class OrderController implements OrderOperations {
 
     @Override
     public OrderDto productReturn(ProductReturnRequest request) {
-        log.info("POST /api/v1/order/return - Возврат заказа: request={}",
-                request);
+        log.info("POST /api/v1/order/return - Возврат заказа: request={}", request);
         OrderDto response = orderService.productReturn(request);
         log.info("Возвращаем заказ: {}", response);
         return response;

@@ -18,6 +18,7 @@
         <module>warehouse</module>
         <module>order</module>
         <module>payment</module>
+        <module>delivery</module>
     </modules>
 
 </project>

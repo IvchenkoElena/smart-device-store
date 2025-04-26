@@ -8,7 +8,6 @@ import java.util.UUID;
 
 @Data
 public class OrderDto {
-
     @NotNull
     private UUID orderId;
     private UUID shoppingCartId;
