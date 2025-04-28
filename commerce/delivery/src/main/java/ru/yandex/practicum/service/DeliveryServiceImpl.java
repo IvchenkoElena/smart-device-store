@@ -9,6 +9,7 @@ import ru.yandex.practicum.api.WarehouseOperations;
 import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.delivery.DeliveryState;
 import ru.yandex.practicum.dto.order.OrderDto;
+import ru.yandex.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.exception.NoDeliveryFoundException;
 import ru.yandex.practicum.mapper.DeliveryMapper;
 import ru.yandex.practicum.model.Address;
@@ -74,18 +75,11 @@ public class DeliveryServiceImpl implements DeliveryService {
                 .orElseThrow(() -> new NoDeliveryFoundException
                         ("Доставки для такого заказа не найдено: orderId = " + orderId));
         delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
-        deliveryRepository.save(delivery);
-
+        delivery = deliveryRepository.save(delivery);
         // изменить статус заказа на ASSEMBLED в сервисе заказов
-
         orderClient.assembly(orderId);
-
-        // и связать идентификатор доставки с внутренней учётной системой через вызов соответствующего метода склада???
-        // не поняла, с чем нужно связать???
-
-       // warehouseClient.
-
-        OrderDto orderDto = orderClient.assembly(orderId);
+        // и связать идентификатор доставки с внутренней учётной системой через вызов соответствующего метода склада
+        warehouseClient.shippedToDelivery(new ShippedToDeliveryRequest(orderId, delivery.getDeliveryId()));
         log.info("Товар передан в доставку: orderId={}", orderId);
     }
 
@@ -98,6 +92,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                         ("Доставки для такого заказа не найдено: orderId = " + orderId));
         delivery.setDeliveryState(DeliveryState.DELIVERED);
         deliveryRepository.save(delivery);
+        orderClient.delivery(orderId);
         log.info("Успешная доставка товара: orderId={}", orderId);
     }
 
@@ -110,6 +105,7 @@ public class DeliveryServiceImpl implements DeliveryService {
                         ("Доставки для такого заказа не найдено: orderId = " + orderId));
         delivery.setDeliveryState(DeliveryState.FAILED);
         deliveryRepository.save(delivery);
+        orderClient.deliveryFailed(orderId);
         log.info("Успешная доставка товара: orderId={}", orderId);
     }
 }

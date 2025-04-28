@@ -17,6 +17,7 @@ import ru.yandex.practicum.dto.order.OrderState;
 import ru.yandex.practicum.dto.order.ProductReturnRequest;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.exception.NoCartException;
 import ru.yandex.practicum.exception.NoOrderFoundException;
@@ -161,6 +162,12 @@ public class OrderServiceImpl implements OrderService {
         log.info("Изменили статус заказа на PAID: OrderId {}", orderId);
         orderToPay = orderRepository.save(orderToPay);
         log.info("Сохранили изменения в БД: {}", orderToPay);
+
+        // assemblyProductForOrderFromShoppingCart для сбора заказа по продуктовой корзине - это
+        // мы тут должны вызвать, после успешной оплаты?;
+
+        warehouseClient.assemblyProductsForOrder(new AssemblyProductsForOrderRequest(orderToPay.getProducts(), orderId));
+
         return orderMapper.toOrderDto(orderToPay);
     }
 

@@ -126,7 +126,7 @@ public class PaymentServiceImpl implements PaymentService {
         log.info("Сохранили новый статус оплаты в БД: {}", payment);
         // вызвать изменение в сервисе заказов — статус оплачен
         try {
-            orderClient.payment(payment.getOrderId());
+            orderClient.paymentFailed(payment.getOrderId());
             log.info("вызвать изменение в сервисе заказов — статус оплачен: orderId{}", payment.getOrderId());
         } catch (FeignException e) {
             if (e instanceof FeignException.NotFound) {
