@@ -9,6 +9,7 @@ import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.service.DeliveryService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -27,9 +28,9 @@ public class DeliveryController implements DeliveryOperations {
     }
 
     @Override
-    public Double deliveryCost(OrderDto orderDto) {
+    public BigDecimal deliveryCost(OrderDto orderDto) {
         log.info("POST /api/v1/delivery/cost - Расчёт полной стоимости доставки заказа: orderDto={}", orderDto);
-        Double response = deliveryService.deliveryCost(orderDto);
+        BigDecimal response = deliveryService.deliveryCost(orderDto);
         log.info("Возвращаем полную стоимость доставки заказа: {}", response);
         return response;
     }

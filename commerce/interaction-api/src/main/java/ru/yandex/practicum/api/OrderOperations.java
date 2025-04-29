@@ -25,7 +25,6 @@ public interface OrderOperations {
 
     @PostMapping("/return")
     OrderDto productReturn(@RequestBody @Valid ProductReturnRequest request);
-    // по спецификации в этом методе еще нужно в параметры передать ProductReturnRequest, нужно ли так сделать? И в тело и в параметры?
 
     @PostMapping("/payment")
     OrderDto payment(@RequestBody @NotNull UUID orderId);

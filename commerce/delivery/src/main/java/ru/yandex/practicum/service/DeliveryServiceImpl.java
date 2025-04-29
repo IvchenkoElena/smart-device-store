@@ -16,6 +16,7 @@ import ru.yandex.practicum.model.Address;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.repository.DeliveryRepository;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -27,13 +28,13 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final WarehouseOperations warehouseClient;
     private final OrderOperations orderClient;
 
-    private static final double BASE_RATE = 5.0;
-    private static final double WAREHOUSE_1_ADDRESS_MULTIPLIER = 1;
-    private static final double WAREHOUSE_2_ADDRESS_MULTIPLIER = 2;
-    private static final double FRAGILE_MULTIPLIER = 0.2;
-    private static final double WEIGHT_MULTIPLIER = 0.3;
-    private static final double VOLUME_MULTIPLIER = 0.2;
-    private static final double STREET_MULTIPLIER = 0.2;
+    private static final BigDecimal BASE_RATE = BigDecimal.valueOf(5.0);
+    private static final BigDecimal WAREHOUSE_1_ADDRESS_MULTIPLIER = BigDecimal.valueOf(1);
+    private static final BigDecimal WAREHOUSE_2_ADDRESS_MULTIPLIER = BigDecimal.valueOf(2);
+    private static final BigDecimal FRAGILE_MULTIPLIER = BigDecimal.valueOf(0.2);
+    private static final BigDecimal WEIGHT_MULTIPLIER = BigDecimal.valueOf(0.3);
+    private static final BigDecimal VOLUME_MULTIPLIER = BigDecimal.valueOf(0.2);
+    private static final BigDecimal STREET_MULTIPLIER = BigDecimal.valueOf(0.2);
 
     @Transactional
     @Override
@@ -47,21 +48,22 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Transactional
     @Override
-    public Double deliveryCost(OrderDto orderDto) {
+    public BigDecimal deliveryCost(OrderDto orderDto) {
         log.info("Рассчитываем стоимость доставки");
         Delivery delivery = deliveryRepository.findById(orderDto.getDeliveryId())
                 .orElseThrow(() -> new NoDeliveryFoundException
                         ("Такой доставки не найдено: deliveryId = " + orderDto.getDeliveryId()));
         Address warehouseAddress = delivery.getFromAddress();
         Address destinationAddress = delivery.getToAddress();
-        Double totalCost = BASE_RATE;
-        totalCost += warehouseAddress.getCity().equals("ADDRESS_1") ?
-                totalCost * WAREHOUSE_1_ADDRESS_MULTIPLIER : totalCost * WAREHOUSE_2_ADDRESS_MULTIPLIER;
-        totalCost += orderDto.getFragile() == true ? totalCost * FRAGILE_MULTIPLIER : 0;
-        totalCost += orderDto.getDeliveryWeight() * WEIGHT_MULTIPLIER;
-        totalCost += orderDto.getDeliveryVolume() * VOLUME_MULTIPLIER;
-        totalCost += warehouseAddress.getStreet().equals(destinationAddress.getStreet()) ?
-                0 : totalCost * STREET_MULTIPLIER;
+        BigDecimal totalCost = BASE_RATE;
+        totalCost = warehouseAddress.getCity().equals("ADDRESS_1") ?
+                totalCost.add(totalCost.multiply(WAREHOUSE_1_ADDRESS_MULTIPLIER)) :
+                totalCost.add(totalCost.multiply(WAREHOUSE_2_ADDRESS_MULTIPLIER));
+        totalCost = orderDto.getFragile() == true ? totalCost.add(totalCost.multiply(FRAGILE_MULTIPLIER)) : totalCost;
+        totalCost = totalCost.add(BigDecimal.valueOf(orderDto.getDeliveryWeight()).multiply(WEIGHT_MULTIPLIER));
+        totalCost = totalCost.add(BigDecimal.valueOf(orderDto.getDeliveryVolume()).multiply(VOLUME_MULTIPLIER));
+        totalCost = warehouseAddress.getStreet().equals(destinationAddress.getStreet()) ?
+                totalCost : totalCost.add(totalCost.multiply(STREET_MULTIPLIER));
         log.info("Возвращаем стоимость доставки: {}", totalCost);
         return totalCost;
     }

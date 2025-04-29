@@ -9,6 +9,7 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.service.PaymentService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -19,17 +20,17 @@ public class PaymentController implements PaymentOperations {
     private final PaymentService paymentService;
 
     @Override
-    public Double productCost(OrderDto orderDto) {
+    public BigDecimal productCost(OrderDto orderDto) {
         log.info("POST /api/v1/payment/productCost - Расчёт стоимости товаров в заказе: orderDto={}", orderDto);
-        Double response = paymentService.productCost(orderDto);
+        BigDecimal response = paymentService.productCost(orderDto);
         log.info("Стоимость товаров в заказе: {}", response);
         return response;
     }
 
     @Override
-    public Double getTotalCost(OrderDto orderDto) {
+    public BigDecimal getTotalCost(OrderDto orderDto) {
         log.info("POST /api/v1/payment/totalCost - Расчёт полной стоимости заказа: orderDto={}", orderDto);
-        Double response = paymentService.getTotalCost(orderDto);
+        BigDecimal response = paymentService.getTotalCost(orderDto);
         log.info("Полная стоимость заказа: {}", response);
         return response;
     }

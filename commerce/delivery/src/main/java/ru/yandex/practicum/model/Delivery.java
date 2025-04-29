@@ -29,10 +29,10 @@ public class Delivery {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "delivery_id")
     private UUID deliveryId;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "from_address_id")
     private Address fromAddress;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "to_address_id")
     private Address toAddress;
     @Column(name = "order_id", nullable = false)

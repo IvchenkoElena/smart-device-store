@@ -4,6 +4,8 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @Table(name="bookings")
 public class OrderBooking {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "booking_id")
     private UUID bookingId;
     @Column(name = "order_id")

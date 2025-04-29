@@ -18,6 +18,7 @@ import ru.yandex.practicum.mapper.PaymentMapper;
 import ru.yandex.practicum.model.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -31,18 +32,20 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderOperations orderClient;
     private final ShoppingStoreOperations shoppingStoreClient;
 
-    @Transactional
+    private static final BigDecimal FEE_MULTIPLIER = BigDecimal.valueOf(0.1);
+
+    @Transactional(readOnly = true)
     @Override
-    public Double productCost(OrderDto orderDto) {
+    public BigDecimal productCost(OrderDto orderDto) {
         log.info("Рассчитываем стоимость товаров в заказе: orderDto={}", orderDto);
         Map<UUID, Integer> products = orderDto.getProducts();
         if (products.isEmpty()) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно информации в заказе для расчёта");
         }
-        Double productCost = 0.0;
+        BigDecimal productCost = BigDecimal.valueOf(0.0);
         Set<UUID> ids = products.keySet();
         for (UUID id : ids) {
-            Double price;
+            BigDecimal price;
             try {
                 price = shoppingStoreClient.getProduct(id).getPrice();
             } catch (FeignException e) {
@@ -53,24 +56,24 @@ public class PaymentServiceImpl implements PaymentService {
                 }
             }
             Integer quantity = products.get(id);
-            productCost += price * quantity;
+            productCost = productCost.add(price.multiply(BigDecimal.valueOf(quantity)));
         }
         log.info("Рассчитали стоимость товаров в заказе: {}", productCost);
         return productCost;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public Double getTotalCost(OrderDto orderDto) {
+    public BigDecimal getTotalCost(OrderDto orderDto) {
         log.info("Рассчитываем полную стоимость заказа: orderDto={}", orderDto);
 
-        Double productCost = orderDto.getProductPrice();
-        Double deliveryTotal = orderDto.getDeliveryPrice();
+        BigDecimal productCost = orderDto.getProductPrice();
+        BigDecimal deliveryTotal = orderDto.getDeliveryPrice();
         if (productCost == null || deliveryTotal == null) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно информации в заказе для расчёта");
         }
-        Double feeTotal = productCost * 0.1;
-        Double totalCost = productCost + feeTotal + deliveryTotal;
+        BigDecimal feeTotal = productCost.multiply(FEE_MULTIPLIER);
+        BigDecimal totalCost = productCost.add(feeTotal).add(deliveryTotal);
         log.info("Рассчитали полную стоимость заказа: {}", totalCost);
         return totalCost;
     }
@@ -79,13 +82,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentDto payment(OrderDto orderDto) {
         log.info("Формируем оплату для заказа: orderDto={}", orderDto);
-        Double productCost = orderDto.getProductPrice();
-        Double deliveryTotal = orderDto.getDeliveryPrice();
-        Double totalCost = orderDto.getTotalPrice();
+        BigDecimal productCost = orderDto.getProductPrice();
+        BigDecimal deliveryTotal = orderDto.getDeliveryPrice();
+        BigDecimal totalCost = orderDto.getTotalPrice();
         if (productCost == null || deliveryTotal == null || totalCost == null) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно информации в заказе для расчёта");
         }
-        Double feeTotal = productCost * 0.1;
+        BigDecimal feeTotal = productCost.multiply(FEE_MULTIPLIER);
         Payment payment = paymentMapper.toPayment(orderDto, feeTotal);
         payment = paymentRepository.save(payment);
         log.info("Сохранили новую оплату в БД: {}", payment);
