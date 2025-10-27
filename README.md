@@ -1,4 +1,4 @@
-# SMART-HOME
+# SMART-DEVICE-STORE
 
 ---
 
